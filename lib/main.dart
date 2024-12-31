@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -32,11 +33,7 @@ class RiskHeatMapChartState extends State<RiskHeatMapChart> {
   void initState() {
     _tooltipBehavior = TooltipBehavior(
       enable: true,
-      header: '',
-      canShowMarker: true,
       tooltipPosition: TooltipPosition.pointer,
-      textStyle: const TextStyle(color: Colors.white),
-      color: Colors.black87,
       builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
           int seriesIndex) {
         _SP500ReturnData data = _heatMapData![pointIndex];
