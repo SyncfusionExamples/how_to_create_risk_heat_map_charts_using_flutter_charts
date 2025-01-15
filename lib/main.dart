@@ -57,36 +57,33 @@ class RiskHeatMapState extends State<RiskHeatMap> {
   Color _buildColor(num value) {
     switch (value) {
       case var val when val >= 20.0:
-        return Colors.green.shade900; // Darkest green
+        return Colors.green.shade900; // Darkest green.
       case var val when val >= 15.0:
-        return Colors.green.shade700; // Dark green
+        return Colors.green.shade700; // Dark green.
       case var val when val >= 10.0:
-        return Colors.green.shade500; // Medium green
+        return Colors.green.shade500; // Medium green.
       case var val when val >= 5.0:
-        return Colors.green.shade300; // Light green
+        return Colors.green.shade300; // Light green.
       case var val when val > 0.0:
-        return Colors.orange.shade400; // Lighter orange
+        return Colors.orange.shade400; // Lighter orange.
       case var val when val >= -2.5:
-        return Colors.orange.shade600; // Medium orange
+        return Colors.orange.shade600; // Medium orange.
       case var val when val >= -5.0:
-        return Colors.orange.shade800; // Darker orange
+        return Colors.orange.shade800; // Darker orange.
       case var val when val >= -10.0:
-        return Colors.red.shade200; // Light red
+        return Colors.red.shade200; // Light red.
       case var val when val >= -15.0:
-        return Colors.red.shade400; // Medium red
+        return Colors.red.shade400; // Medium red.
       case var val when val >= -20.0:
-        return Colors.red.shade600; // Dark red
+        return Colors.red.shade600; // Dark red.
       default:
-        return Colors.red.shade800; // Darkest red
+        return Colors.red.shade800; // Darkest red.
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.blueGrey.shade900,
-        body: Padding(
-            padding: const EdgeInsets.all(20), child: _buildSP500Chart()));
+    return Scaffold(body: _buildSP500Chart());
   }
 
   SfCartesianChart _buildSP500Chart() {
@@ -102,7 +99,7 @@ class RiskHeatMapState extends State<RiskHeatMap> {
             fontFamily: "Roboto"),
       ),
       primaryXAxis: DateTimeCategoryAxis(
-        dateFormat: DateFormat.y(), // Format to display only the year
+        dateFormat: DateFormat.y(), // Format to display only the year.
         labelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 14.0,
@@ -126,7 +123,7 @@ class RiskHeatMapState extends State<RiskHeatMap> {
         majorGridLines: const MajorGridLines(width: 0),
         majorTickLines: const MajorTickLines(size: 0),
         labelStyle: const TextStyle(
-          color: Colors.transparent, // Hide default labels
+          color: Colors.transparent, // Hide default labels.
         ),
         labelIntersectAction: AxisLabelIntersectAction.multipleRows,
         multiLevelLabelStyle: const MultiLevelLabelStyle(
@@ -251,7 +248,10 @@ class _CustomHeatmapStackedBar100Segment
 
   @override
   void transformValues() {
-    /// Given fixed y value and bottom value based on the y axis range.
+    /// Set fixed top and bottom values for each segment based on the series index.
+    /// This ensures that each segment takes up an equal height, creating a heatmap effect.
+    /// By manually assigning these values based on the y axis range, 
+    /// this ensures that the segments' heights are independent of the actual data values.
     if (series.index == 0) {
       top = -33.33;
       bottom = -100;
@@ -268,13 +268,17 @@ class _CustomHeatmapStackedBar100Segment
 
   @override
   void onPaint(Canvas canvas) {
+    // Call the base class's onPaint method to handle default segment rendering.
     super.onPaint(canvas);
 
     if (segmentRect == null) {
       return;
     }
 
+    // Retrieve the specific segment data based on the current segment index.
     final segment = series.dataSource![currentSegmentIndex];
+
+    // Variable to store the y-value for the current series index.
     num? yValue;
     if (series.index == 0) {
       yValue = segment.threeMonthsAfterFirstRateCut;
@@ -284,6 +288,7 @@ class _CustomHeatmapStackedBar100Segment
       yValue = segment.oneYearAfterFirstRateCut;
     }
 
+    // Define the text to display inside the segment, including the percentage.
     final TextSpan textSpan = TextSpan(
       style: const TextStyle(
         color: Colors.white,
@@ -297,9 +302,15 @@ class _CustomHeatmapStackedBar100Segment
       textAlign: TextAlign.center,
       textDirection: ui.TextDirection.ltr,
     );
+
+    // Layout the text painter to calculate its dimensions.
     textPainter.layout();
+
+    // Calculate the X and Y coordinates to center the text inside the segment rectangle.
     double textX = segmentRect!.center.dx - (textPainter.width / 2);
     double textY = segmentRect!.center.dy - (textPainter.height / 2);
+
+    // Render the text at the calculated position on the canvas.
     textPainter.paint(canvas, Offset(textX, textY));
   }
 }
