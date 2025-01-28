@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
-import 'dart:ui' as ui;
+
+// Import Charts.
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,11 +33,6 @@ class RiskHeatMapState extends State<RiskHeatMap> {
 
   @override
   void initState() {
-    _tooltipBehavior = TooltipBehavior(
-      enable: true,
-      tooltipPosition: TooltipPosition.pointer,
-      format: 'point.x : point.y%',
-    );
     _heatMapData = <_SP500ReturnData>[
       _SP500ReturnData(DateTime(1973), -10.2, -6.2, -36.0),
       _SP500ReturnData(DateTime(1974), -14.7, -15.3, 7.5),
@@ -51,6 +47,12 @@ class RiskHeatMapState extends State<RiskHeatMap> {
       _SP500ReturnData(DateTime(2007), -4.4, -11.8, -27.2),
       _SP500ReturnData(DateTime(2019), 3.8, 13.3, 14.5),
     ];
+    _tooltipBehavior = TooltipBehavior(
+      enable: true,
+      animationDuration: 0,
+      format: 'point.x : point.y%',
+      tooltipPosition: TooltipPosition.pointer,
+    );
     super.initState();
   }
 
@@ -83,28 +85,26 @@ class RiskHeatMapState extends State<RiskHeatMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _buildSP500Chart());
+    return Scaffold(
+      body: _buildHeatmapChart(),
+    );
   }
 
-  SfCartesianChart _buildSP500Chart() {
+  SfCartesianChart _buildHeatmapChart() {
     return SfCartesianChart(
       backgroundColor: Colors.blueGrey.shade900,
       plotAreaBorderWidth: 0,
       title: const ChartTitle(
         text: 'S&P 500 Returns After Rate Cuts',
         textStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.white,
-            fontFamily: "Roboto"),
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+          color: Colors.white,
+          fontFamily: "Roboto",
+        ),
       ),
       primaryXAxis: DateTimeCategoryAxis(
         dateFormat: DateFormat.y(), // Format to display only the year.
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14.0,
-          color: Colors.white,
-        ),
         axisLine: const AxisLine(width: 0),
         majorGridLines: const MajorGridLines(width: 0),
         majorTickLines: const MajorTickLines(size: 0),
@@ -116,6 +116,11 @@ class RiskHeatMapState extends State<RiskHeatMap> {
             fontSize: 18.0,
           ),
         ),
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14.0,
+          color: Colors.white,
+        ),
       ),
       primaryYAxis: NumericAxis(
         opposedPosition: true,
@@ -124,21 +129,26 @@ class RiskHeatMapState extends State<RiskHeatMap> {
         majorTickLines: const MajorTickLines(size: 0),
         labelStyle: const TextStyle(
           color: Colors.transparent, // Hide default labels.
+          fontSize: 0,
         ),
         labelIntersectAction: AxisLabelIntersectAction.multipleRows,
         multiLevelLabelStyle: const MultiLevelLabelStyle(
             borderWidth: 0, borderColor: Colors.transparent),
         multiLevelLabels: const <NumericMultiLevelLabel>[
           NumericMultiLevelLabel(
-              start: -90,
-              end: -40,
-              text: 'Three months after \n first rate cut'),
+            start: 0,
+            end: 33.33,
+            text: 'Three months\nafter first rate cut',
+          ),
           NumericMultiLevelLabel(
-              start: -20, end: 20, text: 'Six months after \n first rate cut'),
+            start: 33.34,
+            end: 66.66,
+            text: 'Six months\nafter first rate cut',
+          ),
           NumericMultiLevelLabel(
-            start: 40,
-            end: 90,
-            text: 'One year after \n first rate cut',
+            start: 66.67,
+            end: 100,
+            text: 'One year\nafter first rate cut',
           ),
         ],
         multiLevelLabelFormatter: (MultiLevelLabelRenderDetails details) {
@@ -153,60 +163,87 @@ class RiskHeatMapState extends State<RiskHeatMap> {
           );
         },
       ),
-      series: _getStackedColumnSeries(),
+      series: _buildHeatmapSeries(),
       tooltipBehavior: _tooltipBehavior,
     );
   }
 
-  List<CartesianSeries<_SP500ReturnData, DateTime>> _getStackedColumnSeries() {
+  List<CartesianSeries<_SP500ReturnData, DateTime>> _buildHeatmapSeries() {
     return <CartesianSeries<_SP500ReturnData, DateTime>>[
       StackedBar100Series<_SP500ReturnData, DateTime>(
         dataSource: _heatMapData!,
         xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) =>
-            data.threeMonthsAfterFirstRateCut,
-        borderWidth: 5.0,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        width: 1,
-        borderColor: Colors.blueGrey.shade900,
+        yValueMapper: (_SP500ReturnData data, int index) => data.threeMonths,
         pointColorMapper: (_SP500ReturnData data, int index) =>
-            _buildColor(data.threeMonthsAfterFirstRateCut),
-        onCreateRenderer: (series) {
-          return _CustomHeatmapStackedBar100SeriesRenderer();
-        },
+            _buildColor(data.threeMonths),
+        animationDuration: 0,
+        width: 1,
+        borderWidth: 5.0,
+        borderColor: Colors.blueGrey.shade900,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         name: '3 Months After First Rate Cut',
+        dataLabelSettings: const DataLabelSettings(
+          isVisible: true,
+          labelAlignment: ChartDataLabelAlignment.middle,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+          return _HeatmapSeriesRenderer();
+        },
       ),
       StackedBar100Series<_SP500ReturnData, DateTime>(
         dataSource: _heatMapData!,
         xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) =>
-            data.sixMonthsAfterFirstRateCut,
-        borderWidth: 5.0,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        width: 1,
-        borderColor: Colors.blueGrey.shade900,
+        yValueMapper: (_SP500ReturnData data, int index) => data.sixMonths,
         pointColorMapper: (_SP500ReturnData data, int index) =>
-            _buildColor(data.sixMonthsAfterFirstRateCut),
-        onCreateRenderer: (series) {
-          return _CustomHeatmapStackedBar100SeriesRenderer();
-        },
+            _buildColor(data.sixMonths),
+        animationDuration: 0,
+        width: 1,
+        borderWidth: 5.0,
+        borderColor: Colors.blueGrey.shade900,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         name: '6 Months After First Rate Cut',
+        dataLabelSettings: const DataLabelSettings(
+          isVisible: true,
+          labelAlignment: ChartDataLabelAlignment.middle,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+          return _HeatmapSeriesRenderer();
+        },
       ),
       StackedBar100Series<_SP500ReturnData, DateTime>(
         dataSource: _heatMapData!,
         xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) =>
-            data.oneYearAfterFirstRateCut,
-        borderWidth: 5.0,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        width: 1,
-        borderColor: Colors.blueGrey.shade900,
+        yValueMapper: (_SP500ReturnData data, int index) => data.oneYear,
         pointColorMapper: (_SP500ReturnData data, int index) =>
-            _buildColor(data.oneYearAfterFirstRateCut),
-        onCreateRenderer: (series) {
-          return _CustomHeatmapStackedBar100SeriesRenderer();
-        },
+            _buildColor(data.oneYear),
+        animationDuration: 0,
+        width: 1,
+        borderWidth: 5.0,
+        borderColor: Colors.blueGrey.shade900,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         name: '1 Year After First Rate Cut',
+        dataLabelSettings: const DataLabelSettings(
+          isVisible: true,
+          labelAlignment: ChartDataLabelAlignment.middle,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+          return _HeatmapSeriesRenderer();
+        },
       ),
     ];
   }
@@ -221,96 +258,83 @@ class RiskHeatMapState extends State<RiskHeatMap> {
 class _SP500ReturnData {
   _SP500ReturnData(
     this.year,
-    this.threeMonthsAfterFirstRateCut,
-    this.sixMonthsAfterFirstRateCut,
-    this.oneYearAfterFirstRateCut,
+    this.threeMonths,
+    this.sixMonths,
+    this.oneYear,
   );
 
   final DateTime year;
-  final num threeMonthsAfterFirstRateCut;
-  final num sixMonthsAfterFirstRateCut;
-  final num oneYearAfterFirstRateCut;
+  final num threeMonths;
+  final num sixMonths;
+  final num oneYear;
 }
 
-class _CustomHeatmapStackedBar100SeriesRenderer
+class _HeatmapSeriesRenderer
     extends StackedBar100SeriesRenderer<_SP500ReturnData, DateTime> {
-  _CustomHeatmapStackedBar100SeriesRenderer();
+  _HeatmapSeriesRenderer();
 
   @override
-  StackedBar100Segment<_SP500ReturnData, DateTime> createSegment() {
-    return _CustomHeatmapStackedBar100Segment();
-  }
-}
+  void populateDataSource(
+      [List<ChartValueMapper<_SP500ReturnData, num>>? yPaths,
+      List<List<num>>? chaoticYLists,
+      List<List<num>>? yLists,
+      List<ChartValueMapper<_SP500ReturnData, Object>>? fPaths,
+      List<List<Object?>>? chaoticFLists,
+      List<List<Object?>>? fLists]) {
+    super.populateDataSource(
+        yPaths, chaoticYLists, yLists, fPaths, chaoticFLists, fLists);
 
-class _CustomHeatmapStackedBar100Segment
-    extends StackedBar100Segment<_SP500ReturnData, DateTime> {
-  _CustomHeatmapStackedBar100Segment();
+    // Always keep positive 0 to 100 range even set negative value.
+    yMin = 0;
+    yMax = 100;
 
-  @override
-  void transformValues() {
-    /// Set fixed top and bottom values for each segment based on the series index.
-    /// This ensures that each segment takes up an equal height, creating a heatmap effect.
-    /// By manually assigning these values based on the y axis range, 
-    /// this ensures that the segments' heights are independent of the actual data values.
-    if (series.index == 0) {
-      top = -33.33;
-      bottom = -100;
-    } else if (series.index == 1) {
-      top = 33.33;
-      bottom = -33.33;
-    } else {
-      top = 100;
-      bottom = 33.33;
-    }
-
-    super.transformValues();
+    // Calculate heatmap segment top and bottom values.
+    _computeHeatMapValues();
   }
 
-  @override
-  void onPaint(Canvas canvas) {
-    // Call the base class's onPaint method to handle default segment rendering.
-    super.onPaint(canvas);
-
-    if (segmentRect == null) {
+  void _computeHeatMapValues() {
+    if (xAxis == null || yAxis == null) {
       return;
     }
 
-    // Retrieve the specific segment data based on the current segment index.
-    final segment = series.dataSource![currentSegmentIndex];
-
-    // Variable to store the y-value for the current series index.
-    num? yValue;
-    if (series.index == 0) {
-      yValue = segment.threeMonthsAfterFirstRateCut;
-    } else if (series.index == 1) {
-      yValue = segment.sixMonthsAfterFirstRateCut;
-    } else {
-      yValue = segment.oneYearAfterFirstRateCut;
+    if (yAxis!.dependents.isEmpty) {
+      return;
     }
 
-    // Define the text to display inside the segment, including the percentage.
-    final TextSpan textSpan = TextSpan(
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-      text: '${yValue.toString()}%',
-    );
-    final TextPainter textPainter = TextPainter(
-      text: textSpan,
-      textAlign: TextAlign.center,
-      textDirection: ui.TextDirection.ltr,
-    );
+    // Get the number of series dependent on the yAxis.
+    final int seriesLength = yAxis!.dependents.length;
+    // Calculate the proportional height for each series
+    // (as a percentage of the total height).
+    final num yValue = 100 / seriesLength;
+    // Loop through each dependent series to calculate top and bottom values for
+    // the heatmap.
+    for (int i = 0; i < seriesLength; i++) {
+      // Check if the current series is a '_HeatmapSeriesRenderer'.
+      if (yAxis!.dependents[i] is _HeatmapSeriesRenderer) {
+        final _HeatmapSeriesRenderer current =
+            yAxis!.dependents[i] as _HeatmapSeriesRenderer;
 
-    // Layout the text painter to calculate its dimensions.
-    textPainter.layout();
+        // Skip processing if the series is not visible or has no data.
+        if (!current.controller.isVisible || current.dataCount == 0) {
+          continue;
+        }
 
-    // Calculate the X and Y coordinates to center the text inside the segment rectangle.
-    double textX = segmentRect!.center.dx - (textPainter.width / 2);
-    double textY = segmentRect!.center.dy - (textPainter.height / 2);
+        // Calculate the bottom (stack) value for the current series.
+        num stackValue = 0;
+        stackValue = yValue * i;
 
-    // Render the text at the calculated position on the canvas.
-    textPainter.paint(canvas, Offset(textX, textY));
+        current.topValues.clear();
+        current.bottomValues.clear();
+
+        // Loop through the data points in the current series.
+        final int length = current.dataCount;
+        for (int j = 0; j < length; j++) {
+          // Add the bottom value (stackValue) for the current data point.
+          current.bottomValues.add(stackValue.toDouble());
+          // Add the top value (stackValue + yValue) for the current data point.
+          current.topValues.add((stackValue + yValue).toDouble());
+        }
+      }
+    }
   }
 }
