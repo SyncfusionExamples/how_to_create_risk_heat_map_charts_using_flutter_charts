@@ -28,24 +28,24 @@ class RiskHeatMap extends StatefulWidget {
 }
 
 class RiskHeatMapState extends State<RiskHeatMap> {
-  List<_SP500ReturnData>? _heatMapData;
+  List<_HeatMapData>? _heatMapData;
   TooltipBehavior? _tooltipBehavior;
 
   @override
   void initState() {
-    _heatMapData = <_SP500ReturnData>[
-      _SP500ReturnData(DateTime(1973), -10.2, -6.2, -36.0),
-      _SP500ReturnData(DateTime(1974), -14.7, -15.3, 7.5),
-      _SP500ReturnData(DateTime(1980), 15.0, 28.9, 30.3),
-      _SP500ReturnData(DateTime(1981), -11.0, -7.9, -17.8),
-      _SP500ReturnData(DateTime(1982), -4.8, 17.4, 36.5),
-      _SP500ReturnData(DateTime(1987), 0.1, 1.7, 7.5),
-      _SP500ReturnData(DateTime(1989), 7.4, 7.5, 11.9),
-      _SP500ReturnData(DateTime(1995), 10, 5.1, 13.4),
-      _SP500ReturnData(DateTime(1998), 17.2, 26.5, 27.3),
-      _SP500ReturnData(DateTime(2001), -16.3, -12.4, -14.9),
-      _SP500ReturnData(DateTime(2007), -4.4, -11.8, -27.2),
-      _SP500ReturnData(DateTime(2019), 3.8, 13.3, 14.5),
+    _heatMapData = <_HeatMapData>[
+      _HeatMapData(DateTime(1973), -10.2, -6.2, -36.0),
+      _HeatMapData(DateTime(1974), -14.7, -15.3, 7.5),
+      _HeatMapData(DateTime(1980), 15.0, 28.9, 30.3),
+      _HeatMapData(DateTime(1981), -11.0, -7.9, -17.8),
+      _HeatMapData(DateTime(1982), -4.8, 17.4, 36.5),
+      _HeatMapData(DateTime(1987), 0.1, 1.7, 7.5),
+      _HeatMapData(DateTime(1989), 7.4, 7.5, 11.9),
+      _HeatMapData(DateTime(1995), 10, 5.1, 13.4),
+      _HeatMapData(DateTime(1998), 17.2, 26.5, 27.3),
+      _HeatMapData(DateTime(2001), -16.3, -12.4, -14.9),
+      _HeatMapData(DateTime(2007), -4.4, -11.8, -27.2),
+      _HeatMapData(DateTime(2019), 3.8, 13.3, 14.5),
     ];
     _tooltipBehavior = TooltipBehavior(
       enable: true,
@@ -91,7 +91,8 @@ class RiskHeatMapState extends State<RiskHeatMap> {
   }
 
   SfCartesianChart _buildHeatmapChart() {
-    return SfCartesianChart(
+    return 
+    SfCartesianChart(
       backgroundColor: Colors.blueGrey.shade900,
       plotAreaBorderWidth: 0,
       title: const ChartTitle(
@@ -168,13 +169,13 @@ class RiskHeatMapState extends State<RiskHeatMap> {
     );
   }
 
-  List<CartesianSeries<_SP500ReturnData, DateTime>> _buildHeatmapSeries() {
-    return <CartesianSeries<_SP500ReturnData, DateTime>>[
-      StackedBar100Series<_SP500ReturnData, DateTime>(
+  List<CartesianSeries<_HeatMapData, DateTime>> _buildHeatmapSeries() {
+    return <CartesianSeries<_HeatMapData, DateTime>>[
+      StackedBar100Series<_HeatMapData, DateTime>(
         dataSource: _heatMapData!,
-        xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) => data.threeMonths,
-        pointColorMapper: (_SP500ReturnData data, int index) =>
+        xValueMapper: (_HeatMapData data, int index) => data.year,
+        yValueMapper: (_HeatMapData data, int index) => data.threeMonths,
+        pointColorMapper: (_HeatMapData data, int index) =>
             _buildColor(data.threeMonths),
         animationDuration: 0,
         width: 1,
@@ -191,15 +192,15 @@ class RiskHeatMapState extends State<RiskHeatMap> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
           return _HeatmapSeriesRenderer();
         },
       ),
-      StackedBar100Series<_SP500ReturnData, DateTime>(
+      StackedBar100Series<_HeatMapData, DateTime>(
         dataSource: _heatMapData!,
-        xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) => data.sixMonths,
-        pointColorMapper: (_SP500ReturnData data, int index) =>
+        xValueMapper: (_HeatMapData data, int index) => data.year,
+        yValueMapper: (_HeatMapData data, int index) => data.sixMonths,
+        pointColorMapper: (_HeatMapData data, int index) =>
             _buildColor(data.sixMonths),
         animationDuration: 0,
         width: 1,
@@ -216,15 +217,15 @@ class RiskHeatMapState extends State<RiskHeatMap> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
           return _HeatmapSeriesRenderer();
         },
       ),
-      StackedBar100Series<_SP500ReturnData, DateTime>(
+      StackedBar100Series<_HeatMapData, DateTime>(
         dataSource: _heatMapData!,
-        xValueMapper: (_SP500ReturnData data, int index) => data.year,
-        yValueMapper: (_SP500ReturnData data, int index) => data.oneYear,
-        pointColorMapper: (_SP500ReturnData data, int index) =>
+        xValueMapper: (_HeatMapData data, int index) => data.year,
+        yValueMapper: (_HeatMapData data, int index) => data.oneYear,
+        pointColorMapper: (_HeatMapData data, int index) =>
             _buildColor(data.oneYear),
         animationDuration: 0,
         width: 1,
@@ -241,7 +242,7 @@ class RiskHeatMapState extends State<RiskHeatMap> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onCreateRenderer: (ChartSeries<_SP500ReturnData, DateTime> series) {
+        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
           return _HeatmapSeriesRenderer();
         },
       ),
@@ -255,8 +256,8 @@ class RiskHeatMapState extends State<RiskHeatMap> {
   }
 }
 
-class _SP500ReturnData {
-  _SP500ReturnData(
+class _HeatMapData {
+  _HeatMapData(
     this.year,
     this.threeMonths,
     this.sixMonths,
@@ -270,15 +271,15 @@ class _SP500ReturnData {
 }
 
 class _HeatmapSeriesRenderer
-    extends StackedBar100SeriesRenderer<_SP500ReturnData, DateTime> {
+    extends StackedBar100SeriesRenderer<_HeatMapData, DateTime> {
   _HeatmapSeriesRenderer();
 
   @override
   void populateDataSource(
-      [List<ChartValueMapper<_SP500ReturnData, num>>? yPaths,
+      [List<ChartValueMapper<_HeatMapData, num>>? yPaths,
       List<List<num>>? chaoticYLists,
       List<List<num>>? yLists,
-      List<ChartValueMapper<_SP500ReturnData, Object>>? fPaths,
+      List<ChartValueMapper<_HeatMapData, Object>>? fPaths,
       List<List<Object?>>? chaoticFLists,
       List<List<Object?>>? fLists]) {
     super.populateDataSource(
