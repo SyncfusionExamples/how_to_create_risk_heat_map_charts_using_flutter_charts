@@ -91,8 +91,7 @@ class RiskHeatMapState extends State<RiskHeatMap> {
   }
 
   SfCartesianChart _buildHeatmapChart() {
-    return 
-    SfCartesianChart(
+    return SfCartesianChart(
       backgroundColor: Colors.blueGrey.shade900,
       plotAreaBorderWidth: 0,
       title: const ChartTitle(
@@ -129,10 +128,9 @@ class RiskHeatMapState extends State<RiskHeatMap> {
         majorGridLines: const MajorGridLines(width: 0),
         majorTickLines: const MajorTickLines(size: 0),
         labelStyle: const TextStyle(
-          color: Colors.transparent, // Hide default labels.
+          color: Colors.transparent,
           fontSize: 0,
         ),
-        labelIntersectAction: AxisLabelIntersectAction.multipleRows,
         multiLevelLabelStyle: const MultiLevelLabelStyle(
             borderWidth: 0, borderColor: Colors.transparent),
         multiLevelLabels: const <NumericMultiLevelLabel>[
