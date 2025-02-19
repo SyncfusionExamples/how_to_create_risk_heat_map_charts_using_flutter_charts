@@ -76,28 +76,28 @@ class RiskHeatMapState extends State<RiskHeatMap> {
       ),
       primaryXAxis: DateTimeCategoryAxis(
         isInversed: true,
-        axisLine: AxisLine(width: 0),
-        majorGridLines: MajorGridLines(width: 0),
-        majorTickLines: MajorTickLines(size: 0),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: const MajorGridLines(width: 0),
+        majorTickLines: const MajorTickLines(size: 0),
         dateFormat: DateFormat.y(), // Format to display only the year.
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
-        title: AxisTitle(
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+        title: const AxisTitle(
           text: 'Year of First Rate Cut',
           textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
         ),
       ),
       primaryYAxis: NumericAxis(
         opposedPosition: true,
-        axisLine: AxisLine(width: 0),
-        majorGridLines: MajorGridLines(width: 0),
-        majorTickLines: MajorTickLines(size: 0),
-        minorTickLines: MinorTickLines(size: 0),
-        labelStyle: TextStyle(fontSize: 0),
-        multiLevelLabelStyle: MultiLevelLabelStyle(
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: const MajorGridLines(width: 0),
+        majorTickLines: const MajorTickLines(size: 0),
+        minorTickLines: const MinorTickLines(size: 0),
+        labelStyle: const TextStyle(fontSize: 0),
+        multiLevelLabelStyle: const MultiLevelLabelStyle(
           borderWidth: 0,
           borderColor: Colors.transparent,
         ),
-        multiLevelLabels: <NumericMultiLevelLabel>[
+        multiLevelLabels: const <NumericMultiLevelLabel>[
           NumericMultiLevelLabel(
             start: 0,
             end: 33.33,
