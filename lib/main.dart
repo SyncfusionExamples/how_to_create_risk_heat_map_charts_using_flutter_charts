@@ -56,6 +56,132 @@ class RiskHeatMapState extends State<RiskHeatMap> {
     super.initState();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildHeatmapChart(),
+    );
+  }
+
+  SfCartesianChart _buildHeatmapChart() {
+    return SfCartesianChart(
+      plotAreaBorderWidth: 0,
+      title: const ChartTitle(
+        text: 'Visualizing S&P 500 Returns After Interest Rate Cuts',
+        textStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+          fontFamily: "Roboto",
+        ),
+      ),
+      primaryXAxis: DateTimeCategoryAxis(
+        isInversed: true,
+        axisLine: AxisLine(width: 0),
+        majorGridLines: MajorGridLines(width: 0),
+        majorTickLines: MajorTickLines(size: 0),
+        dateFormat: DateFormat.y(), // Format to display only the year.
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+        title: AxisTitle(
+          text: 'Year of First Rate Cut',
+          textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+        ),
+      ),
+      primaryYAxis: NumericAxis(
+        opposedPosition: true,
+        axisLine: AxisLine(width: 0),
+        majorGridLines: MajorGridLines(width: 0),
+        majorTickLines: MajorTickLines(size: 0),
+        minorTickLines: MinorTickLines(size: 0),
+        labelStyle: TextStyle(fontSize: 0),
+        multiLevelLabelStyle: MultiLevelLabelStyle(
+          borderWidth: 0,
+          borderColor: Colors.transparent,
+        ),
+        multiLevelLabels: <NumericMultiLevelLabel>[
+          NumericMultiLevelLabel(
+            start: 0,
+            end: 33.33,
+            text: 'Three months\nafter first rate cut',
+          ),
+          NumericMultiLevelLabel(
+            start: 33.34,
+            end: 66.66,
+            text: 'Six months\nafter first rate cut',
+          ),
+          NumericMultiLevelLabel(
+            start: 66.67,
+            end: 100,
+            text: 'One year\nafter first rate cut',
+          ),
+        ],
+        multiLevelLabelFormatter: (MultiLevelLabelRenderDetails details) {
+          return ChartAxisLabel(
+            details.text,
+            const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+          );
+        },
+      ),
+      tooltipBehavior: _tooltipBehavior,
+      series: _buildHeatmapSeries(),
+    );
+  }
+
+  List<CartesianSeries<_HeatMapData, DateTime>> _buildHeatmapSeries() {
+    return <CartesianSeries<_HeatMapData, DateTime>>[
+      for (int i = 0; i < 3; i++)
+        StackedBar100Series<_HeatMapData, DateTime>(
+          dataSource: _heatMapData!,
+          xValueMapper: (_HeatMapData data, int index) => data.year,
+          yValueMapper: (_HeatMapData data, int index) => _yValue(data, i),
+          pointColorMapper: (_HeatMapData data, int index) =>
+              _buildColor(_yValue(data, i)),
+          width: 1,
+          name: _seriesName(i),
+          animationDuration: 0,
+          borderColor: Colors.white,
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          dataLabelSettings: const DataLabelSettings(
+            isVisible: true,
+            labelAlignment: ChartDataLabelAlignment.middle,
+            textStyle: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
+            return _HeatmapSeriesRenderer();
+          },
+        ),
+    ];
+  }
+
+  num _yValue(_HeatMapData data, int seriesIndex) {
+    switch (seriesIndex) {
+      case 0:
+        return data.threeMonths;
+      case 1:
+        return data.sixMonths;
+      case 2:
+        return data.oneYear;
+      default:
+        return 0;
+    }
+  }
+
+  String _seriesName(int seriesIndex) {
+    switch (seriesIndex) {
+      case 0:
+        return '3 Months After First Rate Cut';
+      case 1:
+        return '6 Months After First Rate Cut';
+      case 2:
+        return '1 Year After First Rate Cut';
+      default:
+        return '';
+    }
+  }
+
   Color _buildColor(num value) {
     switch (value) {
       case var val when val >= 20.0:
@@ -84,188 +210,20 @@ class RiskHeatMapState extends State<RiskHeatMap> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildHeatmapChart(),
-    );
-  }
-
-  SfCartesianChart _buildHeatmapChart() {
-    return SfCartesianChart(
-      backgroundColor: Colors.blueGrey.shade900,
-      plotAreaBorderWidth: 0,
-      title: const ChartTitle(
-        text: 'S&P 500 Returns After Rate Cuts',
-        textStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-          color: Colors.white,
-          fontFamily: "Roboto",
-        ),
-      ),
-      primaryXAxis: DateTimeCategoryAxis(
-        dateFormat: DateFormat.y(), // Format to display only the year.
-        axisLine: const AxisLine(width: 0),
-        majorGridLines: const MajorGridLines(width: 0),
-        majorTickLines: const MajorTickLines(size: 0),
-        title: const AxisTitle(
-          text: 'Year of First Rate Cut',
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18.0,
-          ),
-        ),
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14.0,
-          color: Colors.white,
-        ),
-      ),
-      primaryYAxis: NumericAxis(
-        opposedPosition: true,
-        axisLine: const AxisLine(width: 0),
-        majorGridLines: const MajorGridLines(width: 0),
-        majorTickLines: const MajorTickLines(size: 0),
-        labelStyle: const TextStyle(
-          color: Colors.transparent,
-          fontSize: 0,
-        ),
-        multiLevelLabelStyle: const MultiLevelLabelStyle(
-            borderWidth: 0, borderColor: Colors.transparent),
-        multiLevelLabels: const <NumericMultiLevelLabel>[
-          NumericMultiLevelLabel(
-            start: 0,
-            end: 33.33,
-            text: 'Three months\nafter first rate cut',
-          ),
-          NumericMultiLevelLabel(
-            start: 33.34,
-            end: 66.66,
-            text: 'Six months\nafter first rate cut',
-          ),
-          NumericMultiLevelLabel(
-            start: 66.67,
-            end: 100,
-            text: 'One year\nafter first rate cut',
-          ),
-        ],
-        multiLevelLabelFormatter: (MultiLevelLabelRenderDetails details) {
-          return ChartAxisLabel(
-            details.text,
-            const TextStyle(
-              color: Colors.white,
-              decoration: TextDecoration.underline,
-              fontWeight: FontWeight.bold,
-              fontSize: 14.0,
-            ),
-          );
-        },
-      ),
-      series: _buildHeatmapSeries(),
-      tooltipBehavior: _tooltipBehavior,
-    );
-  }
-
-  List<CartesianSeries<_HeatMapData, DateTime>> _buildHeatmapSeries() {
-    return <CartesianSeries<_HeatMapData, DateTime>>[
-      StackedBar100Series<_HeatMapData, DateTime>(
-        dataSource: _heatMapData!,
-        xValueMapper: (_HeatMapData data, int index) => data.year,
-        yValueMapper: (_HeatMapData data, int index) => data.threeMonths,
-        pointColorMapper: (_HeatMapData data, int index) =>
-            _buildColor(data.threeMonths),
-        animationDuration: 0,
-        width: 1,
-        borderWidth: 5.0,
-        borderColor: Colors.blueGrey.shade900,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        name: '3 Months After First Rate Cut',
-        dataLabelSettings: const DataLabelSettings(
-          isVisible: true,
-          labelAlignment: ChartDataLabelAlignment.middle,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
-          return _HeatmapSeriesRenderer();
-        },
-      ),
-      StackedBar100Series<_HeatMapData, DateTime>(
-        dataSource: _heatMapData!,
-        xValueMapper: (_HeatMapData data, int index) => data.year,
-        yValueMapper: (_HeatMapData data, int index) => data.sixMonths,
-        pointColorMapper: (_HeatMapData data, int index) =>
-            _buildColor(data.sixMonths),
-        animationDuration: 0,
-        width: 1,
-        borderWidth: 5.0,
-        borderColor: Colors.blueGrey.shade900,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        name: '6 Months After First Rate Cut',
-        dataLabelSettings: const DataLabelSettings(
-          isVisible: true,
-          labelAlignment: ChartDataLabelAlignment.middle,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
-          return _HeatmapSeriesRenderer();
-        },
-      ),
-      StackedBar100Series<_HeatMapData, DateTime>(
-        dataSource: _heatMapData!,
-        xValueMapper: (_HeatMapData data, int index) => data.year,
-        yValueMapper: (_HeatMapData data, int index) => data.oneYear,
-        pointColorMapper: (_HeatMapData data, int index) =>
-            _buildColor(data.oneYear),
-        animationDuration: 0,
-        width: 1,
-        borderWidth: 5.0,
-        borderColor: Colors.blueGrey.shade900,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        name: '1 Year After First Rate Cut',
-        dataLabelSettings: const DataLabelSettings(
-          isVisible: true,
-          labelAlignment: ChartDataLabelAlignment.middle,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onCreateRenderer: (ChartSeries<_HeatMapData, DateTime> series) {
-          return _HeatmapSeriesRenderer();
-        },
-      ),
-    ];
-  }
-
-  @override
   void dispose() {
     _heatMapData!.clear();
+    _tooltipBehavior = null;
     super.dispose();
   }
 }
 
 class _HeatMapData {
-  _HeatMapData(
-    this.year,
-    this.threeMonths,
-    this.sixMonths,
-    this.oneYear,
-  );
+  _HeatMapData(this.year, this.threeMonths, this.sixMonths, this.oneYear);
 
-  final DateTime year;
-  final num threeMonths;
-  final num sixMonths;
-  final num oneYear;
+  dynamic year;
+  late num threeMonths;
+  late num sixMonths;
+  late num oneYear;
 }
 
 class _HeatmapSeriesRenderer
@@ -318,16 +276,17 @@ class _HeatmapSeriesRenderer
           continue;
         }
 
-        // Calculate the bottom (stack) value for the current series.
-        num stackValue = 0;
-        stackValue = yValue * i;
-
         current.topValues.clear();
         current.bottomValues.clear();
+
+        // Calculate the bottom (stack) value for the current series.
+        num stackValue = yValue * i;
 
         // Loop through the data points in the current series.
         final int length = current.dataCount;
         for (int j = 0; j < length; j++) {
+          final num actualYValue = current.yValues[j];
+          if (actualYValue.isNaN) {}
           // Add the bottom value (stackValue) for the current data point.
           current.bottomValues.add(stackValue.toDouble());
           // Add the top value (stackValue + yValue) for the current data point.
